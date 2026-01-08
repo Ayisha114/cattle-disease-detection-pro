@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import Layout from '../components/Layout';
 import axios from 'axios';
-import { Upload, CheckCircle, XCircle, Download, Volume2 } from 'lucide-react';
+import { Upload, CheckCircle, XCircle, Download, Volume2, Loader } from 'lucide-react';
 import jsPDF from 'jspdf';
 
 export default function UploadPage() {
@@ -127,22 +127,6 @@ export default function UploadPage() {
       });
     });
     
-    // Recommendations
-    if (result.recommendations && result.recommendations.length > 0) {
-      y += 5;
-      doc.setFontSize(14);
-      doc.text('Recommendations:', 20, y);
-      y += 10;
-      doc.setFontSize(11);
-      result.recommendations.forEach((rec, index) => {
-        const lines = doc.splitTextToSize(`${index + 1}. ${rec}`, 170);
-        lines.forEach(line => {
-          doc.text(line, 25, y);
-          y += 7;
-        });
-      });
-    }
-    
     // Footer
     doc.setFontSize(10);
     doc.setTextColor(128, 128, 128);
@@ -151,31 +135,76 @@ export default function UploadPage() {
     doc.save(`cattle-report-${result.report_id}.pdf`);
   };
 
+  // Circular Progress Component
+  const CircularProgress = ({ percentage, size = 120 }) => {
+    const radius = (size - 10) / 2;
+    const circumference = 2 * Math.PI * radius;
+    const offset = circumference - (percentage / 100) * circumference;
+
+    return (
+      <div className="relative inline-flex items-center justify-center">
+        <svg width={size} height={size} className="transform -rotate-90">
+          {/* Background circle */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke="#e5e7eb"
+            strokeWidth="8"
+            fill="none"
+          />
+          {/* Progress circle */}
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            stroke={percentage >= 80 ? '#22c55e' : percentage >= 50 ? '#f59e0b' : '#ef4444'}
+            strokeWidth="8"
+            fill="none"
+            strokeDasharray={circumference}
+            strokeDashoffset={offset}
+            strokeLinecap="round"
+            className="transition-all duration-1000 ease-out"
+          />
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-3xl font-bold text-gray-800">{percentage}%</span>
+          <span className="text-xs text-gray-500">Confidence</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <Layout>
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8">Upload Image - Disease Detection</h1>
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Upload Image</h1>
+          <p className="text-gray-600 mt-2">Disease Detection</p>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Upload Section */}
-          <div className="card">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Upload Image</h2>
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+            <h2 className="text-xl font-semibold text-gray-800 mb-6">Upload Image</h2>
             
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center mb-4">
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center mb-6 hover:border-primary-400 transition-colors">
               {preview ? (
                 <div className="relative">
-                  <img src={preview} alt="Preview" className="max-h-64 mx-auto rounded-lg" />
+                  <img src={preview} alt="Preview" className="max-h-72 mx-auto rounded-lg shadow-md" />
                   <button
                     onClick={handleReset}
-                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600"
+                    className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 shadow-lg transition-colors"
                   >
                     <XCircle className="w-5 h-5" />
                   </button>
                 </div>
               ) : (
-                <div>
-                  <Upload className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600 mb-2">Click to upload or drag and drop</p>
+                <div className="py-8">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Upload className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <p className="text-gray-700 font-medium mb-2">Click to upload or drag and drop</p>
                   <p className="text-sm text-gray-500">PNG, JPG up to 10MB</p>
                 </div>
               )}
@@ -188,49 +217,81 @@ export default function UploadPage() {
               />
             </div>
 
-            <label htmlFor="image-upload" className="btn-secondary w-full block text-center cursor-pointer mb-4">
+            <label 
+              htmlFor="image-upload" 
+              className="block w-full text-center py-3 px-6 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-xl cursor-pointer transition-colors mb-4"
+            >
               Select Image
             </label>
 
             <button
               onClick={handleUpload}
               disabled={!selectedImage || loading}
-              className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 px-6 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
-                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <Loader className="w-5 h-5 animate-spin" />
                   Analyzing...
                 </span>
               ) : (
-                'Analyze Image'
+                'Predict'
               )}
             </button>
 
             {error && (
-              <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+              <div className="mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl">
                 {error}
               </div>
             )}
           </div>
 
           {/* Results Section */}
-          <div className="card">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Prediction Results</h2>
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold text-gray-800">Prediction</h2>
+              {result && (
+                <button
+                  onClick={speakResult}
+                  className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                  title="Listen to results"
+                >
+                  <Volume2 className="w-5 h-5 text-gray-600" />
+                </button>
+              )}
+            </div>
             
-            {result ? (
-              <div className="space-y-4">
-                {/* Status Badge */}
-                <div className={`p-4 rounded-lg ${result.status === 'Healthy' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="relative">
+                  <div className="w-24 h-24 border-8 border-gray-200 rounded-full"></div>
+                  <div className="absolute top-0 left-0 w-24 h-24 border-8 border-primary-600 rounded-full border-t-transparent animate-spin"></div>
+                </div>
+                <p className="mt-6 text-gray-600 font-medium">Analyzing image...</p>
+                <p className="text-sm text-gray-500 mt-2">This may take a few seconds</p>
+              </div>
+            ) : result ? (
+              <div className="space-y-6">
+                {/* Confidence Circle */}
+                <div className="flex justify-center py-4">
+                  <CircularProgress percentage={result.confidence} />
+                </div>
+
+                {/* Status */}
+                <div className={`p-5 rounded-xl ${result.status === 'Healthy' ? 'bg-success-50 border-2 border-success-200' : 'bg-danger-50 border-2 border-danger-200'}`}>
                   <div className="flex items-center gap-3">
                     {result.status === 'Healthy' ? (
-                      <CheckCircle className="w-8 h-8 text-green-600" />
+                      <div className="w-12 h-12 bg-success-500 rounded-full flex items-center justify-center">
+                        <CheckCircle className="w-7 h-7 text-white" />
+                      </div>
                     ) : (
-                      <XCircle className="w-8 h-8 text-red-600" />
+                      <div className="w-12 h-12 bg-danger-500 rounded-full flex items-center justify-center">
+                        <XCircle className="w-7 h-7 text-white" />
+                      </div>
                     )}
                     <div>
                       <p className="text-sm font-medium text-gray-600">Status</p>
-                      <p className={`text-2xl font-bold ${result.status === 'Healthy' ? 'text-green-700' : 'text-red-700'}`}>
+                      <p className={`text-2xl font-bold ${result.status === 'Healthy' ? 'text-success-700' : 'text-danger-700'}`}>
                         {result.status}
                       </p>
                     </div>
@@ -239,67 +300,68 @@ export default function UploadPage() {
 
                 {/* Disease Info */}
                 {result.status === 'Diseased' && (
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <span className="font-medium text-gray-700">Disease:</span>
-                      <span className="text-gray-900">{result.disease_name}</span>
+                  <div className="space-y-3">
+                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                      <p className="text-sm text-gray-600 mb-1">Disease Name</p>
+                      <p className="text-lg font-semibold text-gray-800">{result.disease_name}</p>
                     </div>
-                    <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                      <span className="font-medium text-gray-700">Stage:</span>
-                      <span className="text-gray-900">{result.stage}</span>
+                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                      <p className="text-sm text-gray-600 mb-1">Stage</p>
+                      <p className="text-lg font-semibold text-gray-800">{result.stage}</p>
                     </div>
                   </div>
                 )}
 
-                {/* Confidence */}
-                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm font-medium text-blue-600 mb-2">Confidence Score</p>
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 bg-blue-200 rounded-full h-3">
-                      <div
-                        className="bg-blue-600 h-3 rounded-full transition-all"
-                        style={{ width: `${result.confidence}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-xl font-bold text-blue-700">{result.confidence}%</span>
-                  </div>
-                </div>
-
                 {/* Precautions */}
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="font-semibold text-gray-800 mb-3">Precautions:</p>
+                <div className="p-5 bg-warning-50 border border-warning-200 rounded-xl">
+                  <p className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                    <span className="w-2 h-2 bg-warning-500 rounded-full"></span>
+                    Precautions
+                  </p>
                   <ul className="space-y-2">
                     {result.precautions.map((precaution, index) => (
-                      <li key={index} className="flex gap-2 text-sm text-gray-700">
-                        <span className="text-yellow-600">•</span>
+                      <li key={index} className="flex gap-3 text-sm text-gray-700">
+                        <span className="text-warning-600 font-bold">✓</span>
                         <span>{precaution}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3">
-                  <button
-                    onClick={downloadPDF}
-                    className="flex-1 btn-success flex items-center justify-center gap-2"
-                  >
-                    <Download className="w-5 h-5" />
-                    Download PDF
-                  </button>
-                  <button
-                    onClick={speakResult}
-                    className="btn-secondary flex items-center justify-center gap-2"
-                  >
-                    <Volume2 className="w-5 h-5" />
-                    Listen
-                  </button>
-                </div>
+                {/* Recommendations */}
+                {result.recommendations && result.recommendations.length > 0 && (
+                  <div className="p-5 bg-blue-50 border border-blue-200 rounded-xl">
+                    <p className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                      <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                      Recommendations
+                    </p>
+                    <ul className="space-y-2">
+                      {result.recommendations.map((rec, index) => (
+                        <li key={index} className="flex gap-3 text-sm text-gray-700">
+                          <span className="text-blue-600">•</span>
+                          <span>{rec}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Download Button */}
+                <button
+                  onClick={downloadPDF}
+                  className="w-full py-4 px-6 bg-success-500 hover:bg-success-600 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                >
+                  <Download className="w-5 h-5" />
+                  Download as PDF
+                </button>
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500">
-                <Upload className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p>Upload an image to see prediction results</p>
+              <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+                <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <Upload className="w-12 h-12" />
+                </div>
+                <p className="text-gray-600 font-medium">No prediction yet</p>
+                <p className="text-sm text-gray-500 mt-2">Upload an image to get started</p>
               </div>
             )}
           </div>
