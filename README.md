@@ -1,193 +1,408 @@
-# 🐄 Cattle Disease Detection & Health Monitoring System
+# 🐄 Cattle Disease Detection System
 
-A professional, production-ready web application for detecting cattle diseases using Vision Transformer (ViT) AI model.
+A comprehensive web-based application for detecting cattle diseases using deep learning and computer vision. This system helps farmers and veterinarians identify cattle diseases early through image analysis, providing detailed reports with precautions and recommendations.
 
-## 🚀 Features
+![Cattle Disease Detection](https://img.shields.io/badge/Status-Active-success)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Python](https://img.shields.io/badge/Python-3.8+-blue)
+![React](https://img.shields.io/badge/React-18.0+-61dafb)
 
-- **AI-Powered Disease Detection** - Upload cattle images and get instant diagnosis
-- **Multi-Auth System** - Google OAuth & Mobile OTP login
-- **PDF Report Generation** - Professional downloadable reports
-- **Admin Dashboard** - Analytics with interactive charts
-- **Voice Output** - Text-to-speech for results
-- **Multi-language Support** - Farmer-friendly interface
-- **Mobile Responsive** - Works on all devices
+## 📋 Table of Contents
+
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [System Architecture](#system-architecture)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [API Documentation](#api-documentation)
+- [Project Structure](#project-structure)
+- [Screenshots](#screenshots)
+- [Contributing](#contributing)
+- [License](#license)
+
+## ✨ Features
+
+### User Features
+- 🔐 **Secure Authentication**: JWT-based user authentication and authorization
+- 📸 **Image Upload**: Upload cattle images for disease detection
+- 🤖 **AI-Powered Detection**: Deep learning model for accurate disease identification
+- 📊 **Confidence Scoring**: Visual confidence percentage with circular progress indicator
+- 📄 **PDF Reports**: Download detailed reports with precautions and recommendations
+- 🔊 **Text-to-Speech**: Listen to report results
+- 📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+- 📈 **Report History**: View all past predictions and reports
+- 🎨 **Modern UI**: Clean, intuitive interface with smooth animations
+
+### Admin Features
+- 📊 **Dashboard Analytics**: Comprehensive statistics and visualizations
+- 👥 **User Management**: Monitor all registered users
+- 📈 **Disease Distribution**: Visual charts showing disease patterns
+- 📋 **Report Management**: View and filter all system reports
+- 🔍 **Advanced Filters**: Filter reports by status, disease, and date
+- 📥 **Export Data**: Download reports and analytics
+
+### Disease Detection
+- ✅ **Healthy/Diseased Classification**
+- 🦠 **Multiple Disease Types**: Lumpy Skin Disease, Foot and Mouth Disease, etc.
+- 📊 **Disease Stage Identification**: Early, Moderate, Severe
+- 💡 **Precautions & Recommendations**: Actionable advice for treatment
+- 🎯 **High Accuracy**: Trained on extensive cattle disease dataset
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-- React 18 + Vite
-- Tailwind CSS
-- Chart.js for analytics
-- jsPDF for reports
-- React Router for navigation
+- **React 18** - Modern UI library
+- **React Router** - Client-side routing
+- **Axios** - HTTP client
+- **Tailwind CSS** - Utility-first CSS framework
+- **Chart.js** - Data visualization
+- **Lucide React** - Beautiful icons
+- **jsPDF** - PDF generation
+- **Vite** - Fast build tool
 
 ### Backend
-- Node.js + Express
-- MongoDB + Mongoose
-- JWT Authentication
-- Google OAuth 2.0
-- Twilio for OTP
+- **Node.js** - JavaScript runtime
+- **Express.js** - Web framework
+- **MongoDB** - NoSQL database
+- **Mongoose** - MongoDB ODM
+- **JWT** - Authentication
+- **Bcrypt** - Password hashing
+- **Multer** - File upload handling
+- **Python** - ML model integration
+- **TensorFlow/PyTorch** - Deep learning framework
 
-### ML Server
-- Python Flask
-- PyTorch + Vision Transformer (ViT)
-- Image preprocessing with PIL
+### DevOps
+- **Git** - Version control
+- **GitHub** - Code hosting
+- **Docker** - Containerization (optional)
+- **Nginx** - Web server (production)
 
-## 📁 Project Structure
+## 🏗️ System Architecture
 
 ```
-cattle-disease-detection-pro/
-├── frontend/          # React frontend
-├── backend/           # Node.js API
-├── ml-server/         # Python ML inference
-└── docs/              # Documentation
+┌─────────────────┐
+│   React Client  │
+│   (Frontend)    │
+└────────┬────────┘
+         │
+         │ HTTP/REST API
+         │
+┌────────▼────────┐
+│  Express Server │
+│   (Backend)     │
+└────────┬────────┘
+         │
+    ┌────┴────┐
+    │         │
+┌───▼───┐ ┌──▼──────┐
+│MongoDB│ │ ML Model│
+│  DB   │ │ (Python)│
+└───────┘ └─────────┘
 ```
 
-## 🔧 Installation
+## 📦 Installation
 
 ### Prerequisites
-- Node.js 18+
-- Python 3.9+
-- MongoDB
-- Git LFS (for model files)
+- Node.js (v16 or higher)
+- MongoDB (v5 or higher)
+- Python (v3.8 or higher)
+- npm or yarn
 
-### Setup Instructions
-
-1. **Clone the repository**
+### Step 1: Clone the Repository
 ```bash
 git clone https://github.com/Ayisha114/cattle-disease-detection-pro.git
 cd cattle-disease-detection-pro
 ```
 
-2. **Install Frontend**
+### Step 2: Backend Setup
 ```bash
-cd frontend
+cd backend
 npm install
+
+# Create .env file
+cp .env.example .env
+# Edit .env with your configuration
 ```
 
-3. **Install Backend**
+### Step 3: Frontend Setup
 ```bash
-cd ../backend
+cd ../frontend
 npm install
+
+# Create .env file
+cp .env.example .env
+# Edit .env with your configuration
 ```
 
-4. **Install ML Server**
+### Step 4: ML Model Setup
 ```bash
-cd ../ml-server
+cd ../ml-model
 pip install -r requirements.txt
+
+# Download pre-trained model (if available)
+# Or train your own model
+python train.py
 ```
 
-5. **Environment Variables**
+### Step 5: Database Setup
+```bash
+# Start MongoDB service
+sudo systemctl start mongodb
 
-Create `.env` files in each directory:
-
-**backend/.env**
-```
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-TWILIO_ACCOUNT_SID=your_twilio_sid
-TWILIO_AUTH_TOKEN=your_twilio_token
-TWILIO_PHONE_NUMBER=your_twilio_phone
-ML_API_URL=http://localhost:5000
+# Or use MongoDB Atlas (cloud)
+# Update MONGODB_URI in backend/.env
 ```
 
-**frontend/.env**
-```
-VITE_API_URL=http://localhost:3000
-VITE_GOOGLE_CLIENT_ID=your_google_client_id
-```
+## ⚙️ Configuration
 
-**ml-server/.env**
-```
-MODEL_PATH=./models/cattle_disease_vit_model.pth
+### Backend Environment Variables (.env)
+```env
+# Server Configuration
 PORT=5000
+NODE_ENV=development
+
+# Database
+MONGODB_URI=mongodb://localhost:27017/cattle-disease-db
+
+# JWT Secret
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+
+# File Upload
+UPLOAD_DIR=./uploads
+MAX_FILE_SIZE=10485760
+
+# ML Model
+ML_MODEL_PATH=../ml-model/model.h5
+PYTHON_PATH=/usr/bin/python3
 ```
 
-## 🚀 Running the Application
+### Frontend Environment Variables (.env)
+```env
+# API Configuration
+VITE_API_URL=http://localhost:5000/api
+
+# App Configuration
+VITE_APP_NAME=Cattle Disease Detection
+VITE_MAX_UPLOAD_SIZE=10485760
+```
+
+## 🚀 Usage
 
 ### Development Mode
 
-**Terminal 1 - Backend**
+#### Start Backend Server
 ```bash
 cd backend
 npm run dev
+# Server runs on http://localhost:5000
 ```
 
-**Terminal 2 - Frontend**
+#### Start Frontend Development Server
 ```bash
 cd frontend
 npm run dev
+# App runs on http://localhost:5173
 ```
 
-**Terminal 3 - ML Server**
+### Production Mode
+
+#### Build Frontend
 ```bash
-cd ml-server
-python app.py
+cd frontend
+npm run build
+# Creates optimized build in dist/
 ```
 
-### Production Deployment
-
-Deploy to Railway:
+#### Start Production Server
 ```bash
-railway up
+cd backend
+npm start
+# Serves both API and static frontend
 ```
 
-## 📊 API Endpoints
+## 📚 API Documentation
 
-### Authentication
-- `POST /api/auth/google` - Google OAuth login
-- `POST /api/auth/otp/send` - Send OTP
-- `POST /api/auth/otp/verify` - Verify OTP
+### Authentication Endpoints
 
-### Predictions
-- `POST /api/predict` - Upload image and get prediction
-- `GET /api/reports` - Get user reports
-- `GET /api/reports/:id` - Get specific report
-- `GET /api/reports/:id/pdf` - Download PDF report
+#### Register User
+```http
+POST /api/auth/register
+Content-Type: application/json
 
-### Admin
-- `GET /api/admin/users` - Get all users
-- `GET /api/admin/stats` - Get dashboard statistics
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "securePassword123"
+}
+```
 
-## 🔐 Security Features
+#### Login
+```http
+POST /api/auth/login
+Content-Type: application/json
 
-- JWT-based authentication
-- Secure password hashing
-- Rate limiting
-- CORS protection
-- Input validation
-- XSS protection
+{
+  "email": "john@example.com",
+  "password": "securePassword123"
+}
+```
 
-## 📱 Mobile Support
+### Prediction Endpoints
 
-Fully responsive design optimized for:
-- Desktop (1920x1080+)
-- Tablet (768x1024)
-- Mobile (375x667+)
+#### Upload Image for Prediction
+```http
+POST /api/predict
+Authorization: Bearer <token>
+Content-Type: multipart/form-data
 
-## 🎨 UI Design
+image: <file>
+```
 
-Based on professional farmer-friendly interface with:
-- Clean blue/green color scheme
-- Large, readable fonts
-- Simple navigation
-- Visual feedback
-- Accessibility features
+#### Get User Reports
+```http
+GET /api/reports
+Authorization: Bearer <token>
+```
 
-## 📄 License
+### Admin Endpoints
 
-MIT License - See LICENSE file for details
+#### Get System Statistics
+```http
+GET /api/admin/stats
+Authorization: Bearer <admin-token>
+```
 
-## 👥 Contributors
+#### Get All Users
+```http
+GET /api/admin/users
+Authorization: Bearer <admin-token>
+```
 
-- Ayisha D - Full Stack Developer
+## 📁 Project Structure
 
-## 📞 Support
+```
+cattle-disease-detection-pro/
+├── frontend/                 # React frontend application
+│   ├── public/              # Static assets
+│   ├── src/
+│   │   ├── components/      # Reusable components
+│   │   │   ├── Layout.jsx
+│   │   │   ├── Navbar.jsx
+│   │   │   └── ProtectedRoute.jsx
+│   │   ├── context/         # React context
+│   │   │   └── AuthContext.jsx
+│   │   ├── pages/           # Page components
+│   │   │   ├── HomePage.jsx
+│   │   │   ├── LoginPage.jsx
+│   │   │   ├── RegisterPage.jsx
+│   │   │   ├── DashboardPage.jsx
+│   │   │   ├── UploadPage.jsx
+│   │   │   ├── ReportsPage.jsx
+│   │   │   └── AdminDashboard.jsx
+│   │   ├── App.jsx          # Main app component
+│   │   ├── main.jsx         # Entry point
+│   │   └── index.css        # Global styles
+│   ├── package.json
+│   ├── vite.config.js
+│   └── tailwind.config.js
+│
+├── backend/                  # Express backend server
+│   ├── config/              # Configuration files
+│   │   └── db.js
+│   ├── middleware/          # Custom middleware
+│   │   ├── auth.js
+│   │   └── upload.js
+│   ├── models/              # Mongoose models
+│   │   ├── User.js
+│   │   └── Report.js
+│   ├── routes/              # API routes
+│   │   ├── auth.js
+│   │   ├── predict.js
+│   │   ├── reports.js
+│   │   └── admin.js
+│   ├── utils/               # Utility functions
+│   │   └── mlPredictor.js
+│   ├── uploads/             # Uploaded images
+│   ├── server.js            # Server entry point
+│   └── package.json
+│
+├── ml-model/                 # Machine learning model
+│   ├── data/                # Training data
+│   ├── models/              # Saved models
+│   ├── notebooks/           # Jupyter notebooks
+│   ├── train.py             # Training script
+│   ├── predict.py           # Prediction script
+│   └── requirements.txt
+│
+├── docs/                     # Documentation
+│   ├── API.md
+│   ├── DEPLOYMENT.md
+│   └── CONTRIBUTING.md
+│
+├── .gitignore
+├── LICENSE
+└── README.md
+```
 
-For issues and questions, please open a GitHub issue.
+## 📸 Screenshots
+
+### Home Page
+![Home Page](screenshots/home.png)
+
+### Upload & Prediction
+![Upload Page](screenshots/upload.png)
+
+### Reports Dashboard
+![Reports](screenshots/reports.png)
+
+### Admin Dashboard
+![Admin Dashboard](screenshots/admin.png)
+
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+Please read [CONTRIBUTING.md](docs/CONTRIBUTING.md) for details on our code of conduct and development process.
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👥 Authors
+
+- **Ayisha D** - *Initial work* - [Ayisha114](https://github.com/Ayisha114)
+
+## 🙏 Acknowledgments
+
+- Dataset providers for cattle disease images
+- Open source community for amazing tools and libraries
+- GITAM University for project support
+- All contributors who helped improve this project
+
+## 📞 Contact
+
+For questions or support, please contact:
+- Email: adadapee@gitam.in
+- GitHub: [@Ayisha114](https://github.com/Ayisha114)
+
+## 🔮 Future Enhancements
+
+- [ ] Mobile application (React Native)
+- [ ] Real-time video analysis
+- [ ] Multi-language support
+- [ ] Integration with veterinary services
+- [ ] Blockchain-based report verification
+- [ ] Advanced analytics and insights
+- [ ] Notification system for disease outbreaks
+- [ ] Community forum for farmers
 
 ---
 
-Built with ❤️ for farmers and cattle health monitoring
+**Made with ❤️ for better cattle health management**
